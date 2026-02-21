@@ -19,31 +19,48 @@ logger = logging.getLogger(__name__)
 
 # APIs & Token
 TOKEN = "8312222553:AAEdCJK6ZiJRpkoqWXbooXNYNSTLnP0YmO0"
-# Switched to HandyAPI because Binlist blocks Render servers
 BIN_API = "https://data.handyapi.com/bin/{}"
 
-# Disguise the bot as a real web browser to bypass Cloudflare API blocks
+# Disguise the bot as a real web browser
 HTTP_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
-# --- Translation Dictionary for Full Country Names ---
+# --- Massive Translation Dictionary (115+ Countries & IBAN Supported Nations) ---
 COUNTRY_NAMES = {
-    "nepal": "np", "united states": "us", "usa": "us", "uk": "gb", 
-    "united kingdom": "gb", "germany": "de", "france": "fr", "spain": "es", 
-    "italy": "it", "india": "in", "bangladesh": "bd", "canada": "ca", 
-    "australia": "au", "brazil": "br", "russia": "ru", "japan": "jp", 
-    "china": "cn", "mexico": "mx", "netherlands": "nl", "switzerland": "ch", 
-    "sweden": "se", "norway": "no", "denmark": "dk", "finland": "fi", 
-    "poland": "pl", "turkey": "tr", "greece": "gr", "argentina": "ar", 
-    "colombia": "co", "peru": "pe", "korea": "kr", "indonesia": "id", 
-    "malaysia": "my", "philippines": "ph", "thailand": "th", "vietnam": "vn", 
-    "egypt": "eg", "saudi arabia": "sa", "uae": "ae", "israel": "il", 
-    "portugal": "pt", "austria": "at", "hungary": "hu", "belgium": "be", 
-    "pakistan": "pk", "singapore": "sg", "sri lanka": "lk", "south africa": "za"
+    "albania": "al", "andorra": "ad", "austria": "at", "azerbaijan": "az", 
+    "bahrain": "bh", "belarus": "by", "belgium": "be", "bosnia and herzegovina": "ba", 
+    "bosnia": "ba", "brazil": "br", "bulgaria": "bg", "costa rica": "cr", 
+    "croatia": "hr", "cyprus": "cy", "czech republic": "cz", "czechia": "cz", 
+    "denmark": "dk", "dominican republic": "do", "egypt": "eg", "el salvador": "sv", 
+    "estonia": "ee", "faroe islands": "fo", "finland": "fi", "france": "fr", 
+    "georgia": "ge", "germany": "de", "gibraltar": "gi", "greece": "gr", 
+    "greenland": "gl", "guatemala": "gt", "holy see": "va", "vatican": "va", 
+    "hungary": "hu", "iceland": "is", "iraq": "iq", "ireland": "ie", "israel": "il", 
+    "italy": "it", "jordan": "jo", "kazakhstan": "kz", "kosovo": "xk", "kuwait": "kw", 
+    "latvia": "lv", "lebanon": "lb", "libya": "ly", "liechtenstein": "li", 
+    "lithuania": "lt", "luxembourg": "lu", "malta": "mt", "mauritania": "mr", 
+    "mauritius": "mu", "moldova": "md", "monaco": "mc", "montenegro": "me", 
+    "netherlands": "nl", "north macedonia": "mk", "macedonia": "mk", "norway": "no", 
+    "oman": "om", "pakistan": "pk", "palestine": "ps", "poland": "pl", 
+    "portugal": "pt", "qatar": "qa", "romania": "ro", "saint lucia": "lc", 
+    "san marino": "sm", "sao tome and principe": "st", "saudi arabia": "sa", 
+    "serbia": "rs", "seychelles": "sc", "slovak republic": "sk", "slovakia": "sk", 
+    "slovenia": "si", "spain": "es", "sudan": "sd", "sweden": "se", 
+    "switzerland": "ch", "timor-leste": "tl", "tunisia": "tn", "turkey": "tr", 
+    "ukraine": "ua", "united arab emirates": "ae", "uae": "ae", 
+    "united kingdom": "gb", "uk": "gb", "great britain": "gb", 
+    "virgin islands british": "vg", "bvi": "vg", "nepal": "np", "india": "in", 
+    "bangladesh": "bd", "united states": "us", "usa": "us", "america": "us", 
+    "canada": "ca", "australia": "au", "new zealand": "nz", "japan": "jp", 
+    "china": "cn", "south africa": "za", "mexico": "mx", "argentina": "ar", 
+    "chile": "cl", "peru": "pe", "colombia": "co", "venezuela": "ve", 
+    "russia": "ru", "indonesia": "id", "malaysia": "my", "philippines": "ph", 
+    "thailand": "th", "vietnam": "vn", "singapore": "sg", "sri lanka": "lk", 
+    "south korea": "kr", "korea": "kr", "nigeria": "ng", "kenya": "ke", "ghana": "gh"
 }
 
-# Faker Locale Map (Now includes Nepal explicitly)
+# Faker Locale Map
 LOCALE_MAP = {
     'us': 'en_US', 'gb': 'en_GB', 'uk': 'en_GB', 'ca': 'en_CA', 'au': 'en_AU',
     'de': 'de_DE', 'fr': 'fr_FR', 'it': 'it_IT', 'es': 'es_ES', 'bd': 'bn_BD',
@@ -56,7 +73,8 @@ LOCALE_MAP = {
     'eg': 'ar_EG', 'sa': 'ar_SA', 'ae': 'ar_AE', 'il': 'he_IL', 'pt': 'pt_PT',
     'at': 'de_AT', 'hu': 'hu_HU', 'bg': 'bg_BG', 'hr': 'hr_HR', 'sk': 'sk_SK',
     'ua': 'uk_UA', 'ie': 'en_IE', 'ng': 'en_NG', 'ke': 'en_KE', 'nz': 'en_NZ',
-    'be': 'nl_BE', 'pk': 'en_PK', 'sg': 'en_SG', 'lk': 'en_LK', 'np': 'ne_NP'
+    'be': 'nl_BE', 'pk': 'en_PK', 'sg': 'en_SG', 'lk': 'en_LK', 'np': 'ne_NP',
+    'ee': 'et_EE', 'lt': 'lt_LT', 'lv': 'lv_LV', 'si': 'sl_SI', 'rs': 'sr_RS'
 }
 
 # --- Helper Functions ---
@@ -78,7 +96,6 @@ def generate_dot_trick_email(base_name: str) -> str:
     return f"{dotted_name}@gmail.com"
 
 def get_flag(country_code: str) -> str:
-    """Generates a flag emoji from a 2-letter country code."""
     if not country_code or len(country_code) != 2: return "🌍"
     return ''.join(chr(ord(c.upper()) + 127397) for c in country_code)
 
@@ -210,10 +227,7 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     user_input = " ".join(context.args).lower()
-    
-    # Check if they typed a full country name (like "nepal" -> "np")
     country_code = COUNTRY_NAMES.get(user_input, user_input)
-    
     locale = LOCALE_MAP.get(country_code, 'en_US')
     raw_country_name = user_input.upper() if country_code in LOCALE_MAP else "UNITED STATES (Fallback)"
     
@@ -247,17 +261,10 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     user_input = " ".join(context.args).lower()
     country_code = COUNTRY_NAMES.get(user_input, user_input).upper()
-    locale = LOCALE_MAP.get(country_code.lower())
-
-    if not locale:
-        await update.message.reply_text("❌ **Country not mapped or supported for IBAN.**", parse_mode="Markdown")
-        return
 
     try:
-        # Faker creates the valid raw IBAN string, Schwifty parses the details cleanly
-        fake = Faker(locale)
-        iban_str = fake.iban()
-        iban_obj = schwifty.IBAN(iban_str)
+        iban_obj = schwifty.IBAN.generate(country_code)
+        iban_str = str(iban_obj)
         flag = get_flag(country_code)
         
         msg = (
@@ -271,10 +278,10 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📝 BBAN: `{iban_obj.bban}`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
-    except AttributeError:
-        await update.message.reply_text("❌ **This specific country's banking system does not support automatic IBAN generation.**", parse_mode="Markdown")
+    except ValueError:
+        await update.message.reply_text(f"❌ **'{country_code}' is invalid or does not use the IBAN system.**\n*(Note: Countries like the USA, Canada, India, and Nepal do not use IBANs)*", parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text("⚠️ **Error parsing IBAN data.**", parse_mode="Markdown")
+        await update.message.reply_text("⚠️ **Error generating IBAN data.**", parse_mode="Markdown")
 
 async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -290,18 +297,28 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with httpx.AsyncClient() as client:
         try:
-            resp = await client.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1", headers=HTTP_HEADERS, timeout=10.0)
-            if resp.status_code == 200:
-                email = resp.json()[0]
+            domain_resp = await client.get("https://api.mail.tm/domains", timeout=10.0)
+            if domain_resp.status_code != 200:
+                await update.message.reply_text("❌ **Failed to fetch email servers.**", parse_mode="Markdown")
+                return
+                
+            domain = domain_resp.json()[0]['domain']
+            username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+            address = f"{username}@{domain}"
+            password = f"{username}SecretPass123!"
+            
+            acc_resp = await client.post("https://api.mail.tm/accounts", json={"address": address, "password": password}, timeout=10.0)
+            
+            if acc_resp.status_code in [200, 201]:
                 msg = (
                     f"📧 **Temporary Email Generated** ✅\n\n"
-                    f"📫 **Address:** `{email}`\n\n"
+                    f"📫 **Address:** `{address}`\n\n"
                     f"👇 *To check for new messages, copy the address and send:*\n"
-                    f"`/inbox {email}`"
+                    f"`/inbox {address}`"
                 )
                 await update.message.reply_text(msg, parse_mode="Markdown")
             else:
-                await update.message.reply_text("❌ **Failed to generate email.**", parse_mode="Markdown")
+                await update.message.reply_text("❌ **Failed to register email account.**", parse_mode="Markdown")
         except Exception as e:
             await update.message.reply_text("⚠️ **Connection error to email server.**", parse_mode="Markdown")
 
@@ -310,32 +327,39 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⚠️ **Usage:** `/inbox <email_address>`", parse_mode="Markdown")
         return
 
-    email = context.args[0]
-    if "@" not in email:
+    address = context.args[0]
+    if "@" not in address:
         await update.message.reply_text("❌ **Invalid email format.**", parse_mode="Markdown")
         return
 
-    login, domain = email.split("@")
+    username = address.split("@")[0]
+    password = f"{username}SecretPass123!"
+
     async with httpx.AsyncClient() as client:
         try:
-            url = f"https://www.1secmail.com/api/v1/?action=getMessages&login={login}&domain={domain}"
-            resp = await client.get(url, headers=HTTP_HEADERS, timeout=10.0)
+            token_resp = await client.post("https://api.mail.tm/token", json={"address": address, "password": password}, timeout=10.0)
+            if token_resp.status_code != 200:
+                await update.message.reply_text("❌ **Could not authenticate. Make sure the address was generated by this bot.**", parse_mode="Markdown")
+                return
+                
+            token = token_resp.json()['token']
+            headers = {"Authorization": f"Bearer {token}"}
             
-            if resp.status_code == 200:
-                messages = resp.json()
+            msg_resp = await client.get("https://api.mail.tm/messages", headers=headers, timeout=10.0)
+            if msg_resp.status_code == 200:
+                messages = msg_resp.json().get('hydra:member', [])
                 if not messages:
                     await update.message.reply_text("📭 **Inbox is currently empty.**\nWait a few seconds and try again.", parse_mode="Markdown")
                     return
 
                 latest_msg_id = messages[0]['id']
-                read_url = f"https://www.1secmail.com/api/v1/?action=readMessage&login={login}&domain={domain}&id={latest_msg_id}"
-                read_resp = await client.get(read_url, headers=HTTP_HEADERS, timeout=10.0)
+                read_resp = await client.get(f"https://api.mail.tm/messages/{latest_msg_id}", headers=headers, timeout=10.0)
 
                 if read_resp.status_code == 200:
                     msg_data = read_resp.json()
-                    sender = msg_data.get('from', 'Unknown')
+                    sender = msg_data.get('from', {}).get('address', 'Unknown')
                     subject = msg_data.get('subject', 'No Subject')
-                    text_body = msg_data.get('textBody', 'No Content available.')[:1000] 
+                    text_body = msg_data.get('text', 'No Content available.')[:1000] 
 
                     output = (
                         f"📬 **New Message Received!**\n\n"
