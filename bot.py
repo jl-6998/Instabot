@@ -82,7 +82,8 @@ LOCALE_MAP = {
     'sa': 'ar_SA', 'se': 'sv_SE', 'sg': 'en_SG', 'si': 'sl_SI', 'sk': 'sk_SK', 
     'sv': 'es_SV', 'th': 'th_TH', 'tr': 'tr_TR', 'tw': 'zh_TW', 'ua': 'uk_UA', 
     'us': 'en_US', 'uy': 'es_UY', 've': 'es_VE', 'vn': 'vi_VN', 'za': 'en_ZA',
-    'dz': 'ar_DZ', 'kz': 'kk_KZ'
+    # Used stable fallbacks for regions Faker struggles with natively
+    'dz': 'ar_AE', 'kz': 'ru_RU' 
 }
 
 # --- Helper Functions ---
@@ -243,7 +244,11 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
     flag_emoji = get_flag(country_code) if country_code in LOCALE_MAP else "🇺🇸"
 
     try:
-        fake = Faker(locale)
+        try:
+            fake = Faker(locale)
+        except:
+            fake = Faker('en_US') # Unbreakable fallback if Faker rejects the locale
+            
         full_name = fake.name()
         state = getattr(fake, 'administrative_unit', getattr(fake, 'state', lambda: "N/A"))()
         
@@ -260,7 +265,8 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text(f"⚠️ **Error generating offline address:** `{str(e)}`", parse_mode="Markdown")
+        # Removed Markdown parsing here so Telegram doesn't crash on unescaped characters in the error!
+        await update.message.reply_text(f"⚠️ Error generating offline address: {str(e)}")
 
 async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
@@ -298,6 +304,9 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         iban_obj = schwifty.IBAN(iban_str)
         flag = get_flag(country_code)
         
+        # Check digits are ALWAYS characters 3 and 4 of the string!
+        check_digits = iban_str[2:4] 
+        
         msg = (
             f"🌍 **IBAN Details** 🏦\n\n"
             f"🏳️ Country: {country_code} {flag}\n"
@@ -305,12 +314,13 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📏 Length: {len(iban_str)}\n\n"
             f"🏛️ Bank Code: `{iban_obj.bank_code or 'N/A'}`\n"
             f"💳 Account Number: `{iban_obj.account_code or 'N/A'}`\n"
-            f"✅ Check Digits: `{iban_obj.checksum}`\n"
+            f"✅ Check Digits: `{check_digits}`\n"
             f"📝 BBAN: `{iban_obj.bban}`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text(f"⚠️ **Error parsing IBAN data:** `{str(e)}`", parse_mode="Markdown")
+        # Send raw string so Markdown characters in the error don't crash the bot
+        await update.message.reply_text(f"⚠️ Error parsing IBAN data: {str(e)}")
 
 async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -326,10 +336,11 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with httpx.AsyncClient() as client:
         try:
+            # FIX: Safely parse the complex nested dictionary Mail.tm uses for Domains
             domain_resp = await client.get("https://api.mail.tm/domains", headers=HTTP_HEADERS, timeout=10.0)
             domain_data = domain_resp.json()
             
-            # Robust extraction of the domain no matter what format Mail.tm returns
+            # Extract domain string dynamically depending on their API version
             if isinstance(domain_data, dict) and 'hydra:member' in domain_data:
                 domain = domain_data['hydra:member'][0]['domain']
             elif isinstance(domain_data, list) and len(domain_data) > 0:
