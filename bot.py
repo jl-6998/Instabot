@@ -27,36 +27,44 @@ HTTP_HEADERS = {
     "Accept": "application/json"
 }
 
-# --- Massive Translation Dictionary (Every Country Faker/IBAN Supports) ---
+# --- Massive Translation Dictionary (Every Country in the World) ---
 COUNTRY_NAMES = {
-    "afghanistan": "af", "albania": "al", "algeria": "dz", "andorra": "ad", "argentina": "ar", 
-    "armenia": "am", "australia": "au", "austria": "at", "azerbaijan": "az", "bahrain": "bh", 
-    "bangladesh": "bd", "belarus": "by", "belgium": "be", "bolivia": "bo", "bosnia": "ba", 
-    "brazil": "br", "bulgaria": "bg", "canada": "ca", "chile": "cl", "china": "cn", 
-    "colombia": "co", "costa rica": "cr", "croatia": "hr", "cuba": "cu", "cyprus": "cy", 
-    "czechia": "cz", "czech republic": "cz", "denmark": "dk", "dominican republic": "do", 
-    "ecuador": "ec", "egypt": "eg", "el salvador": "sv", "estonia": "ee", "faroe islands": "fo", 
-    "finland": "fi", "france": "fr", "georgia": "ge", "germany": "de", "ghana": "gh", 
-    "gibraltar": "gi", "greece": "gr", "greenland": "gl", "guatemala": "gt", "honduras": "hn", 
-    "hungary": "hu", "iceland": "is", "india": "in", "indonesia": "id", "iran": "ir", 
-    "iraq": "iq", "ireland": "ie", "israel": "il", "italy": "it", "japan": "jp", 
-    "jordan": "jo", "kazakhstan": "kz", "kenya": "ke", "kosovo": "xk", "kuwait": "kw", 
-    "latvia": "lv", "lebanon": "lb", "libya": "ly", "liechtenstein": "li", "lithuania": "lt", 
-    "luxembourg": "lu", "malaysia": "my", "malta": "mt", "mauritania": "mr", "mauritius": "mu", 
-    "mexico": "mx", "moldova": "md", "monaco": "mc", "montenegro": "me", "morocco": "ma", 
-    "nepal": "np", "netherlands": "nl", "new zealand": "nz", "nicaragua": "ni", "nigeria": "ng", 
-    "north macedonia": "mk", "norway": "no", "oman": "om", "pakistan": "pk", "palestine": "ps", 
-    "paraguay": "py", "peru": "pe", "philippines": "ph", "poland": "pl", "portugal": "pt", 
-    "qatar": "qa", "romania": "ro", "russia": "ru", "san marino": "sm", "saudi arabia": "sa", 
-    "serbia": "rs", "singapore": "sg", "slovakia": "sk", "slovenia": "si", "south africa": "za", 
-    "south korea": "kr", "korea": "kr", "spain": "es", "sri lanka": "lk", "sweden": "se", 
-    "switzerland": "ch", "syria": "sy", "taiwan": "tw", "thailand": "th", "tunisia": "tn", 
-    "turkey": "tr", "uae": "ae", "united arab emirates": "ae", "uk": "gb", "united kingdom": "gb", 
-    "ukraine": "ua", "uruguay": "uy", "us": "us", "usa": "us", "united states": "us", 
-    "venezuela": "ve", "vietnam": "vn"
+    "afghanistan": "af", "albania": "al", "algeria": "dz", "andorra": "ad", "angola": "ao", "antigua and barbuda": "ag", 
+    "argentina": "ar", "armenia": "am", "australia": "au", "austria": "at", "azerbaijan": "az", "bahamas": "bs", 
+    "bahrain": "bh", "bangladesh": "bd", "barbados": "bb", "belarus": "by", "belgium": "be", "belize": "bz", 
+    "benin": "bj", "bhutan": "bt", "bolivia": "bo", "bosnia": "ba", "botswana": "bw", "brazil": "br", "brunei": "bn", 
+    "bulgaria": "bg", "burkina faso": "bf", "burundi": "bi", "cabo verde": "cv", "cambodia": "kh", "cameroon": "cm", 
+    "canada": "ca", "central african republic": "cf", "chad": "td", "chile": "cl", "china": "cn", "colombia": "co", 
+    "comoros": "km", "congo": "cg", "costa rica": "cr", "croatia": "hr", "cuba": "cu", "cyprus": "cy", "czechia": "cz", 
+    "denmark": "dk", "djibouti": "dj", "dominica": "dm", "dominican republic": "do", "ecuador": "ec", "egypt": "eg", 
+    "el salvador": "sv", "equatorial guinea": "gq", "eritrea": "er", "estonia": "ee", "eswatini": "sz", "ethiopia": "et", 
+    "fiji": "fj", "finland": "fi", "france": "fr", "gabon": "ga", "gambia": "gm", "georgia": "ge", "germany": "de", 
+    "ghana": "gh", "greece": "gr", "grenada": "gd", "guatemala": "gt", "guinea": "gn", "guinea-bissau": "gw", 
+    "guyana": "gy", "haiti": "ht", "honduras": "hn", "hungary": "hu", "iceland": "is", "india": "in", "indonesia": "id", 
+    "iran": "ir", "iraq": "iq", "ireland": "ie", "israel": "il", "italy": "it", "jamaica": "jm", "japan": "jp", 
+    "jordan": "jo", "kazakhstan": "kz", "kenya": "ke", "kiribati": "ki", "kuwait": "kw", "kyrgyzstan": "kg", "laos": "la", 
+    "latvia": "lv", "lebanon": "lb", "lesotho": "ls", "liberia": "lr", "libya": "ly", "liechtenstein": "li", 
+    "lithuania": "lt", "luxembourg": "lu", "madagascar": "mg", "malawi": "mw", "malaysia": "my", "maldives": "mv", 
+    "mali": "ml", "malta": "mt", "marshall islands": "mh", "mauritania": "mr", "mauritius": "mu", "mexico": "mx", 
+    "micronesia": "fm", "moldova": "md", "monaco": "mc", "mongolia": "mn", "montenegro": "me", "morocco": "ma", 
+    "mozambique": "mz", "myanmar": "mm", "namibia": "na", "nauru": "nr", "nepal": "np", "netherlands": "nl", 
+    "new zealand": "nz", "nicaragua": "ni", "niger": "ne", "nigeria": "ng", "north korea": "kp", "north macedonia": "mk", 
+    "norway": "no", "oman": "om", "pakistan": "pk", "palau": "pw", "palestine": "ps", "panama": "pa", 
+    "papua new guinea": "pg", "paraguay": "py", "peru": "pe", "philippines": "ph", "poland": "pl", "portugal": "pt", 
+    "qatar": "qa", "romania": "ro", "russia": "ru", "rwanda": "rw", "saint kitts and nevis": "kn", "saint lucia": "lc", 
+    "saint vincent": "vc", "samoa": "ws", "san marino": "sm", "sao tome and principe": "st", "saudi arabia": "sa", 
+    "senegal": "sn", "serbia": "rs", "seychelles": "sc", "sierra leone": "sl", "singapore": "sg", "slovakia": "sk", 
+    "slovenia": "si", "solomon islands": "sb", "somalia": "so", "south africa": "za", "south korea": "kr", "korea": "kr", 
+    "south sudan": "ss", "spain": "es", "sri lanka": "lk", "sudan": "sd", "suriname": "sr", "sweden": "se", 
+    "switzerland": "ch", "syria": "sy", "taiwan": "tw", "tajikistan": "tj", "tanzania": "tz", "thailand": "th", 
+    "timor-leste": "tl", "togo": "tg", "tonga": "to", "trinidad and tobago": "tt", "tunisia": "tn", "turkey": "tr", 
+    "turkmenistan": "tm", "tuvalu": "tv", "uganda": "ug", "ukraine": "ua", "uae": "ae", "united arab emirates": "ae", 
+    "uk": "gb", "united kingdom": "gb", "uruguay": "uy", "us": "us", "usa": "us", "united states": "us", 
+    "uzbekistan": "uz", "vanuatu": "vu", "vatican city": "va", "venezuela": "ve", "vietnam": "vn", "yemen": "ye", 
+    "zambia": "zm", "zimbabwe": "zw"
 }
 
-# --- Faker Locale Map (Every Locale Supported by Python Faker) ---
+# --- Faker Locale Map ---
 LOCALE_MAP = {
     'ar': 'es_AR', 'am': 'hy_AM', 'au': 'en_AU', 'at': 'de_AT', 'az': 'az_AZ', 
     'bd': 'bn_BD', 'be': 'nl_BE', 'bg': 'bg_BG', 'bo': 'es_BO', 'br': 'pt_BR', 
@@ -73,7 +81,8 @@ LOCALE_MAP = {
     'pt': 'pt_PT', 'py': 'es_PY', 'ro': 'ro_RO', 'rs': 'sr_RS', 'ru': 'ru_RU', 
     'sa': 'ar_SA', 'se': 'sv_SE', 'sg': 'en_SG', 'si': 'sl_SI', 'sk': 'sk_SK', 
     'sv': 'es_SV', 'th': 'th_TH', 'tr': 'tr_TR', 'tw': 'zh_TW', 'ua': 'uk_UA', 
-    'us': 'en_US', 'uy': 'es_UY', 've': 'es_VE', 'vn': 'vi_VN', 'za': 'en_ZA'
+    'us': 'en_US', 'uy': 'es_UY', 've': 'es_VE', 'vn': 'vi_VN', 'za': 'en_ZA',
+    'dz': 'ar_DZ', 'kz': 'kk_KZ'
 }
 
 # --- Helper Functions ---
@@ -261,16 +270,31 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = " ".join(context.args).lower()
     country_code = COUNTRY_NAMES.get(user_input, user_input).upper()
 
+    iban_str = None
+    
+    # Method 1: Generate purely offline using Faker (Most reliable for cloud servers)
     try:
-        # 1. Fetch random valid IBAN from an online generator to ensure perfect validity
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(f"https://www.iban-generator.com/api/generate?country={country_code}", headers=HTTP_HEADERS, timeout=10.0)
-            iban_str = resp.json().get("iban")
-            
-            if not iban_str:
-                raise ValueError("API did not return an IBAN.")
-                
-        # 2. Slice it cleanly using Schwifty offline
+        locale = LOCALE_MAP.get(country_code.lower())
+        if locale:
+            fake = Faker(locale)
+            if hasattr(fake, 'iban'):
+                iban_str = fake.iban()
+    except:
+        pass
+
+    # Method 2: Fallback to schwifty generator
+    if not iban_str:
+        try:
+            iban_str = str(schwifty.IBAN.generate(country_code))
+        except:
+            pass
+
+    if not iban_str:
+        await update.message.reply_text(f"❌ **'{country_code}' does not use the IBAN system or offline generation failed.**\n*(Note: Countries like the USA, Canada, India, and Nepal do not use IBANs)*", parse_mode="Markdown")
+        return
+
+    # Parse details with Schwifty
+    try:
         iban_obj = schwifty.IBAN(iban_str)
         flag = get_flag(country_code)
         
@@ -286,7 +310,7 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text(f"❌ **'{country_code}' is invalid, does not use the IBAN system, or API failed.**", parse_mode="Markdown")
+        await update.message.reply_text(f"⚠️ **Error parsing IBAN data:** `{str(e)}`", parse_mode="Markdown")
 
 async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -302,17 +326,16 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with httpx.AsyncClient() as client:
         try:
-            # FIX: Safely parse the complex nested dictionary Mail.tm uses for Domains
             domain_resp = await client.get("https://api.mail.tm/domains", headers=HTTP_HEADERS, timeout=10.0)
             domain_data = domain_resp.json()
             
-            # Extract domain string dynamically depending on their API version
-            if 'hydra:member' in domain_data:
+            # Robust extraction of the domain no matter what format Mail.tm returns
+            if isinstance(domain_data, dict) and 'hydra:member' in domain_data:
                 domain = domain_data['hydra:member'][0]['domain']
-            elif type(domain_data) is list:
-                domain = domain_data[0]['domain']
+            elif isinstance(domain_data, list) and len(domain_data) > 0:
+                domain = domain_data[0].get('domain', 'vjuum.com')
             else:
-                domain = "vjuum.com" # Reliable static fallback domain
+                domain = "vjuum.com"
                 
             username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
             address = f"{username}@{domain}"
@@ -361,7 +384,16 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Fetch Inbox
             msg_resp = await client.get("https://api.mail.tm/messages", headers=auth_headers, timeout=10.0)
             if msg_resp.status_code == 200:
-                messages = msg_resp.json().get('hydra:member', [])
+                data = msg_resp.json()
+                
+                # Robust parsing of messages (handles both Dictionary and List responses safely)
+                if isinstance(data, list):
+                    messages = data
+                elif isinstance(data, dict):
+                    messages = data.get('hydra:member', [])
+                else:
+                    messages = []
+                
                 if not messages:
                     await update.message.reply_text("📭 **Inbox is currently empty.**\nWait a few seconds and try again.", parse_mode="Markdown")
                     return
