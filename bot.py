@@ -138,7 +138,7 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "└ Example : `/bin 412236`\n\n"
         "🔐 **CC Generator**\n"
         "├ Command : `/gen BIN|MM|YYYY|CVV`\n"
-        "└ Example : `/gen 374355xxxx|xx|2025|xxxx`\n\n"
+        "└ Example : `/gen 601100xxxx|xx|2025|xxx`\n\n"
         "ℹ️ **IBAN Generator**\n"
         "├ Command : `/iban COUNTRY_NAME`\n"
         "└ Example : `/iban germany`\n\n"
@@ -198,25 +198,46 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Please provide at least a 6-digit BIN.")
         return
 
-    # --- SMART CARD LENGTH DETECTION ---
+    # --- SMART CARD NETWORK & LENGTH DETECTION ---
     card_len = 16
     cvv_len = 3
     
     if base_bin.startswith(('34', '37')):
-        card_len = 15 # Amex
+        card_len = 15 # American Express
         cvv_len = 4
-    elif base_bin.startswith(('36', '38', '300', '301', '302', '303', '304', '305')):
+    elif base_bin.startswith(('30', '36', '38', '39')):
         card_len = 14 # Diners Club
+    elif base_bin.startswith(('6011', '65', '64', '622')):
+        card_len = 16 # Discover
+    elif base_bin.startswith('35'):
+        card_len = 16 # JCB
+    
+    # Fallback to avoid crashes if someone provides an overly long base BIN
+    if len(base_bin) >= card_len:
+        card_len = len(base_bin) + 1 
 
     generated_cards = []
     for _ in range(10):
-        # max(0, ...) ensures we don't crash if they input a BIN that's already longer than the card_len
-        card_num = base_bin + "".join(random.choices(string.digits, k=max(0, card_len - len(base_bin))))
+        # 1. Generate payload (everything except the last Luhn digit)
+        payload = base_bin + "".join(random.choices(string.digits, k=max(0, card_len - len(base_bin) - 1)))
+        
+        # 2. Calculate the valid Luhn checksum digit mathematically
+        digits = [int(x) for x in payload]
+        for i in range(len(digits) - 1, -1, -2):
+            digits[i] *= 2
+            if digits[i] > 9:
+                digits[i] -= 9
+        checksum = (10 - (sum(digits) % 10)) % 10
+        
+        # 3. Assemble full mathematically valid card
+        card_num = payload + str(checksum)
+        
         mm = str(random.randint(1, 12)).zfill(2)
         yyyy = str(random.randint(2025, 2035))
         cvv = "".join(random.choices(string.digits, k=cvv_len))
         generated_cards.append(f"`{card_num}|{mm}|{yyyy}|{cvv}`")
 
+    # Look up real BIN details to make the message look professional
     info_str, bank_str, country_str = "Unknown", "Unknown", "Unknown"
     async with httpx.AsyncClient() as client:
         try:
@@ -258,7 +279,7 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             fake = Faker(locale)
         except:
-            fake = Faker('en_US') # Unbreakable fallback if Faker rejects the locale
+            fake = Faker('en_US')
             
         full_name = fake.name()
         state = getattr(fake, 'administrative_unit', getattr(fake, 'state', lambda: "N/A"))()
@@ -288,7 +309,6 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     iban_str = None
     
-    # Method 1: Generate purely offline using Faker (Most reliable for cloud servers)
     try:
         locale = LOCALE_MAP.get(country_code.lower())
         if locale:
@@ -298,7 +318,6 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         pass
 
-    # Method 2: Fallback to schwifty generator
     if not iban_str:
         try:
             iban_str = str(schwifty.IBAN.generate(country_code))
@@ -309,12 +328,10 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ **'{country_code}' does not use the IBAN system or offline generation failed.**\n*(Note: Countries like the USA, Canada, India, and Nepal do not use IBANs)*", parse_mode="Markdown")
         return
 
-    # Parse details with Schwifty
     try:
         iban_obj = schwifty.IBAN(iban_str)
         flag = get_flag(country_code)
         
-        # Check digits are ALWAYS characters 3 and 4 of the string!
         check_digits = iban_str[2:4] 
         
         msg = (
