@@ -19,9 +19,31 @@ logger = logging.getLogger(__name__)
 
 # APIs & Token
 TOKEN = "8312222553:AAEdCJK6ZiJRpkoqWXbooXNYNSTLnP0YmO0"
-BIN_API = "https://lookup.binlist.net/{}"
+# Switched to HandyAPI because Binlist blocks Render servers
+BIN_API = "https://data.handyapi.com/bin/{}"
 
-# Faker Locale Map (70+ Countries)
+# Disguise the bot as a real web browser to bypass Cloudflare API blocks
+HTTP_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+}
+
+# --- Translation Dictionary for Full Country Names ---
+COUNTRY_NAMES = {
+    "nepal": "np", "united states": "us", "usa": "us", "uk": "gb", 
+    "united kingdom": "gb", "germany": "de", "france": "fr", "spain": "es", 
+    "italy": "it", "india": "in", "bangladesh": "bd", "canada": "ca", 
+    "australia": "au", "brazil": "br", "russia": "ru", "japan": "jp", 
+    "china": "cn", "mexico": "mx", "netherlands": "nl", "switzerland": "ch", 
+    "sweden": "se", "norway": "no", "denmark": "dk", "finland": "fi", 
+    "poland": "pl", "turkey": "tr", "greece": "gr", "argentina": "ar", 
+    "colombia": "co", "peru": "pe", "korea": "kr", "indonesia": "id", 
+    "malaysia": "my", "philippines": "ph", "thailand": "th", "vietnam": "vn", 
+    "egypt": "eg", "saudi arabia": "sa", "uae": "ae", "israel": "il", 
+    "portugal": "pt", "austria": "at", "hungary": "hu", "belgium": "be", 
+    "pakistan": "pk", "singapore": "sg", "sri lanka": "lk", "south africa": "za"
+}
+
+# Faker Locale Map (Now includes Nepal explicitly)
 LOCALE_MAP = {
     'us': 'en_US', 'gb': 'en_GB', 'uk': 'en_GB', 'ca': 'en_CA', 'au': 'en_AU',
     'de': 'de_DE', 'fr': 'fr_FR', 'it': 'it_IT', 'es': 'es_ES', 'bd': 'bn_BD',
@@ -34,7 +56,7 @@ LOCALE_MAP = {
     'eg': 'ar_EG', 'sa': 'ar_SA', 'ae': 'ar_AE', 'il': 'he_IL', 'pt': 'pt_PT',
     'at': 'de_AT', 'hu': 'hu_HU', 'bg': 'bg_BG', 'hr': 'hr_HR', 'sk': 'sk_SK',
     'ua': 'uk_UA', 'ie': 'en_IE', 'ng': 'en_NG', 'ke': 'en_KE', 'nz': 'en_NZ',
-    'be': 'nl_BE', 'pk': 'en_PK', 'sg': 'en_SG', 'lk': 'en_LK'
+    'be': 'nl_BE', 'pk': 'en_PK', 'sg': 'en_SG', 'lk': 'en_LK', 'np': 'ne_NP'
 }
 
 # --- Helper Functions ---
@@ -57,11 +79,10 @@ def generate_dot_trick_email(base_name: str) -> str:
 
 def get_flag(country_code: str) -> str:
     """Generates a flag emoji from a 2-letter country code."""
-    if len(country_code) != 2: return ""
+    if not country_code or len(country_code) != 2: return "🌍"
     return ''.join(chr(ord(c.upper()) + 127397) for c in country_code)
 
 def to_bold_sans(text: str) -> str:
-    """Converts standard text into 𝗯𝗼𝗹𝗱 𝘀𝗮𝗻𝘀-𝘀𝗲𝗿𝗶𝗳 Unicode."""
     bold_text = ""
     for char in text:
         if 'A' <= char <= 'Z': bold_text += chr(ord(char) - 65 + 120276)
@@ -80,7 +101,6 @@ class DummyHandler(BaseHTTPRequestHandler):
 def keep_alive():
     port = int(os.environ.get("PORT", 8080))
     server = HTTPServer(("0.0.0.0", port), DummyHandler)
-    print(f"Dummy web server listening on port {port}")
     server.serve_forever()
 
 # --- Command Handlers ---
@@ -95,11 +115,11 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "├ Command : `/gen BIN|MM|YYYY|CVV`\n"
         "└ Example : `/gen 412236xxxx|xx|2025|xxx`\n\n"
         "ℹ️ **IBAN Generator**\n"
-        "├ Command : `/iban COUNTRY_CODE`\n"
-        "└ Example : `/iban de`\n\n"
+        "├ Command : `/iban COUNTRY_NAME`\n"
+        "└ Example : `/iban germany`\n\n"
         "📍 **Fake Address**\n"
-        "├ Command : `/fake {country_code}`\n"
-        "├ Example : `/fake gb`\n"
+        "├ Command : `/fake {country}`\n"
+        "├ Example : `/fake nepal`\n"
         "└ Example : `/fake us`\n\n"
         "📧 **Temp Mail**\n"
         "├ Command : `/email`\n"
@@ -118,24 +138,29 @@ async def bin_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bin_val = context.args[0][:8]
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(BIN_API.format(bin_val), timeout=10.0)
+            response = await client.get(BIN_API.format(bin_val), headers=HTTP_HEADERS, timeout=10.0)
             if response.status_code == 200:
                 data = response.json()
-                msg = (
-                    f"🏦 𝗕𝗜𝗡 𝗟𝗼𝗼𝗸𝘂𝗽 𝗥𝗲𝘀𝘂𝗹𝘁 🔍\n\n"
-                    f"🔢 𝗕𝗶𝗻 ⇾ `{bin_val}`\n"
-                    f"🟢 𝗦𝘁𝗮𝘁𝘂𝘀 ⇾ ✅ SUCCESS\n"
-                    f"💳 𝗦𝗰𝗵𝗲𝗺𝗲 ⇾ {data.get('scheme', 'UNKNOWN').upper()}\n"
-                    f"🏷️ 𝗧𝘆𝗽𝗲 ⇾ {data.get('type', 'UNKNOWN').upper()}\n"
-                    f"🏛️ 𝗜𝘀𝘀𝘂𝗲𝗿/𝗕𝗮𝗻𝗸 ⇾ {data.get('bank', {}).get('name', 'UNKNOWN').upper()}\n"
-                    f"💎 𝗧𝗶𝗲𝗿 ⇾ {data.get('brand', 'UNKNOWN').upper()}\n"
-                    f"🌍 𝗖𝗼𝘂𝗻𝘁𝗿𝘆 ⇾ {data.get('country', {}).get('name', 'UNKNOWN')} {data.get('country', {}).get('emoji', '')}\n"
-                    f"🛡️ 𝗟𝘂𝗵𝗻 ⇾ {luhn_check(bin_val + '0000000000')}"
-                )
-                await update.message.reply_text(msg, parse_mode="Markdown")
+                if data.get("Status") == "SUCCESS":
+                    country_name = data.get('Country', {}).get('Name', 'UNKNOWN')
+                    country_code = data.get('Country', {}).get('A2', '')
+                    msg = (
+                        f"🏦 𝗕𝗜𝗡 𝗟𝗼𝗼𝗸𝘂𝗽 𝗥𝗲𝘀𝘂𝗹𝘁 🔍\n\n"
+                        f"🔢 𝗕𝗶𝗻 ⇾ `{bin_val}`\n"
+                        f"🟢 𝗦𝘁𝗮𝘁𝘂𝘀 ⇾ ✅ SUCCESS\n"
+                        f"💳 𝗦𝗰𝗵𝗲𝗺𝗲 ⇾ {data.get('Scheme', 'UNKNOWN').upper()}\n"
+                        f"🏷️ 𝗧𝘆𝗽𝗲 ⇾ {data.get('Type', 'UNKNOWN').upper()}\n"
+                        f"🏛️ 𝗜𝘀𝘀𝘂𝗲𝗿/𝗕𝗮𝗻𝗸 ⇾ {data.get('Issuer', 'UNKNOWN').upper()}\n"
+                        f"💎 𝗧𝗶𝗲𝗿 ⇾ {data.get('CardTier', 'UNKNOWN').upper()}\n"
+                        f"🌍 𝗖𝗼𝘂𝗻𝘁𝗿𝘆 ⇾ {country_name} {get_flag(country_code)}\n"
+                        f"🛡️ 𝗟𝘂𝗵𝗻 ⇾ {luhn_check(bin_val + '0000000000')}"
+                    )
+                    await update.message.reply_text(msg, parse_mode="Markdown")
+                else:
+                    await update.message.reply_text("❌ **BIN not found.**", parse_mode="Markdown")
             else:
-                await update.message.reply_text("❌ **BIN not found or API rate-limited.**", parse_mode="Markdown")
-        except:
+                await update.message.reply_text("❌ **API rate-limited.**", parse_mode="Markdown")
+        except Exception as e:
             await update.message.reply_text("⚠️ **Connection error to lookup service.**", parse_mode="Markdown")
 
 async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -158,12 +183,15 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info_str, bank_str, country_str = "Unknown", "Unknown", "Unknown"
     async with httpx.AsyncClient() as client:
         try:
-            resp = await client.get(BIN_API.format(base_bin[:8]), timeout=8.0)
+            resp = await client.get(BIN_API.format(base_bin[:8]), headers=HTTP_HEADERS, timeout=8.0)
             if resp.status_code == 200:
                 d = resp.json()
-                info_str = f"{d.get('scheme', '').upper()} - {d.get('type', '').upper()}".strip(" -") or "Unknown"
-                bank_str = d.get('bank', {}).get('name', 'Unknown')
-                country_str = f"{d.get('country', {}).get('name', 'Unknown')} {d.get('country', {}).get('emoji', '')}".strip()
+                if d.get("Status") == "SUCCESS":
+                    info_str = f"{d.get('Scheme', '').upper()} - {d.get('Type', '').upper()}".strip(" -") or "Unknown"
+                    bank_str = d.get('Issuer', 'Unknown')
+                    c_name = d.get('Country', {}).get('Name', 'Unknown')
+                    c_code = d.get('Country', {}).get('A2', '')
+                    country_str = f"{c_name} {get_flag(c_code)}".strip()
         except: pass
 
     msg = (
@@ -178,14 +206,17 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text("⚠️ **Usage:** `/fake <COUNTRY_CODE>`\nExample: `/fake bd`", parse_mode="Markdown")
+        await update.message.reply_text("⚠️ **Usage:** `/fake <COUNTRY>`\nExample: `/fake nepal`", parse_mode="Markdown")
         return
     
-    country_code = context.args[0].lower()
-    locale = LOCALE_MAP.get(country_code, 'en_US')
-    raw_country_name = country_code.upper() if country_code in LOCALE_MAP else "UNITED STATES (Fallback)"
+    user_input = " ".join(context.args).lower()
     
-    # Format country nicely (e.g. 𝗙𝗥𝗔𝗡𝗖𝗘) and get the emoji flag
+    # Check if they typed a full country name (like "nepal" -> "np")
+    country_code = COUNTRY_NAMES.get(user_input, user_input)
+    
+    locale = LOCALE_MAP.get(country_code, 'en_US')
+    raw_country_name = user_input.upper() if country_code in LOCALE_MAP else "UNITED STATES (Fallback)"
+    
     display_country = to_bold_sans(raw_country_name)
     flag_emoji = get_flag(country_code) if country_code in LOCALE_MAP else "🇺🇸"
 
@@ -211,13 +242,22 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text("⚠️ **Usage:** `/iban <COUNTRY_CODE>`\nExample: `/iban de`", parse_mode="Markdown")
+        await update.message.reply_text("⚠️ **Usage:** `/iban <COUNTRY>`\nExample: `/iban germany`", parse_mode="Markdown")
         return
     
-    country_code = context.args[0].upper()
+    user_input = " ".join(context.args).lower()
+    country_code = COUNTRY_NAMES.get(user_input, user_input).upper()
+    locale = LOCALE_MAP.get(country_code.lower())
+
+    if not locale:
+        await update.message.reply_text("❌ **Country not mapped or supported for IBAN.**", parse_mode="Markdown")
+        return
+
     try:
-        iban_obj = schwifty.IBAN.generate(country_code)
-        iban_str = str(iban_obj)
+        # Faker creates the valid raw IBAN string, Schwifty parses the details cleanly
+        fake = Faker(locale)
+        iban_str = fake.iban()
+        iban_obj = schwifty.IBAN(iban_str)
         flag = get_flag(country_code)
         
         msg = (
@@ -231,8 +271,10 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📝 BBAN: `{iban_obj.bban}`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
-    except ValueError:
-        await update.message.reply_text(f"❌ **'{country_code}' is invalid or does not use the IBAN system.**", parse_mode="Markdown")
+    except AttributeError:
+        await update.message.reply_text("❌ **This specific country's banking system does not support automatic IBAN generation.**", parse_mode="Markdown")
+    except Exception as e:
+        await update.message.reply_text("⚠️ **Error parsing IBAN data.**", parse_mode="Markdown")
 
 async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -245,13 +287,10 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-# --- NEW REAL EMAIL FUNCTIONS ADDED HERE ---
-
 async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Generates a real, working temporary email address."""
     async with httpx.AsyncClient() as client:
         try:
-            resp = await client.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1", timeout=10.0)
+            resp = await client.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1", headers=HTTP_HEADERS, timeout=10.0)
             if resp.status_code == 200:
                 email = resp.json()[0]
                 msg = (
@@ -262,15 +301,13 @@ async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 await update.message.reply_text(msg, parse_mode="Markdown")
             else:
-                await update.message.reply_text("❌ **Failed to generate email from server.**", parse_mode="Markdown")
+                await update.message.reply_text("❌ **Failed to generate email.**", parse_mode="Markdown")
         except Exception as e:
-            logger.error(f"Email Gen Error: {e}")
             await update.message.reply_text("⚠️ **Connection error to email server.**", parse_mode="Markdown")
 
 async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Checks the inbox of the generated temporary email."""
     if not context.args:
-        await update.message.reply_text("⚠️ **Usage:** `/inbox <email_address>`\nExample: `/inbox user@1secmail.com`", parse_mode="Markdown")
+        await update.message.reply_text("⚠️ **Usage:** `/inbox <email_address>`", parse_mode="Markdown")
         return
 
     email = context.args[0]
@@ -279,11 +316,10 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     login, domain = email.split("@")
-
     async with httpx.AsyncClient() as client:
         try:
             url = f"https://www.1secmail.com/api/v1/?action=getMessages&login={login}&domain={domain}"
-            resp = await client.get(url, timeout=10.0)
+            resp = await client.get(url, headers=HTTP_HEADERS, timeout=10.0)
             
             if resp.status_code == 200:
                 messages = resp.json()
@@ -293,7 +329,7 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 latest_msg_id = messages[0]['id']
                 read_url = f"https://www.1secmail.com/api/v1/?action=readMessage&login={login}&domain={domain}&id={latest_msg_id}"
-                read_resp = await client.get(read_url, timeout=10.0)
+                read_resp = await client.get(read_url, headers=HTTP_HEADERS, timeout=10.0)
 
                 if read_resp.status_code == 200:
                     msg_data = read_resp.json()
@@ -308,20 +344,17 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"📄 **Message:**\n`{text_body}`"
                     )
                     await update.message.reply_text(output, parse_mode="Markdown")
-                else:
-                    await update.message.reply_text("❌ **Could not read the message content.**", parse_mode="Markdown")
+            else:
+                await update.message.reply_text("❌ **Could not reach inbox.**", parse_mode="Markdown")
         except Exception as e:
-            logger.error(f"Inbox Check Error: {e}")
             await update.message.reply_text("⚠️ **Connection error while checking inbox.**", parse_mode="Markdown")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 **Welcome!** Send `/menu` to see available commands.", parse_mode="Markdown")
 
 def main():
-    # 1. Start the dummy web server in a separate background thread
     threading.Thread(target=keep_alive, daemon=True).start()
 
-    # 2. Build the Telegram Bot
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
@@ -331,14 +364,10 @@ def main():
     application.add_handler(CommandHandler("iban", gen_iban))
     application.add_handler(CommandHandler("fake", fake_address))
     application.add_handler(CommandHandler("me", profile_info))
-    
-    # 3. Add the new real email commands
     application.add_handler(CommandHandler("email", gen_email))
     application.add_handler(CommandHandler("inbox", check_inbox))
 
     print("Bot is polling and ready to go! 🚀")
-    
-    # 4. Start polling Telegram for messages
     application.run_polling()
 
 if __name__ == "__main__":
