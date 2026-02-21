@@ -1,6 +1,9 @@
 import logging
 import random
 import string
+import os
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import httpx
 from faker import Faker
 import schwifty
@@ -66,6 +69,20 @@ def to_bold_sans(text: str) -> str:
         else: bold_text += char
     return bold_text
 
+# --- Dummy Web Server to keep Render Happy ---
+
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive and running!")
+
+def keep_alive():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), DummyHandler)
+    print(f"Dummy web server listening on port {port}")
+    server.serve_forever()
+
 # --- Command Handlers ---
 
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -84,6 +101,9 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "├ Command : `/fake {country_code}`\n"
         "├ Example : `/fake gb`\n"
         "└ Example : `/fake us`\n\n"
+        "📧 **Temp Mail**\n"
+        "├ Command : `/email`\n"
+        "└ Command : `/inbox {email_address}`\n\n"
         "👤 **Profile Info**\n"
         "└ Command : `/me`\n\n"
         "📌 **Menu**\n"
@@ -225,10 +245,83 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
+# --- NEW REAL EMAIL FUNCTIONS ADDED HERE ---
+
+async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generates a real, working temporary email address."""
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1", timeout=10.0)
+            if resp.status_code == 200:
+                email = resp.json()[0]
+                msg = (
+                    f"📧 **Temporary Email Generated** ✅\n\n"
+                    f"📫 **Address:** `{email}`\n\n"
+                    f"👇 *To check for new messages, copy the address and send:*\n"
+                    f"`/inbox {email}`"
+                )
+                await update.message.reply_text(msg, parse_mode="Markdown")
+            else:
+                await update.message.reply_text("❌ **Failed to generate email from server.**", parse_mode="Markdown")
+        except Exception as e:
+            logger.error(f"Email Gen Error: {e}")
+            await update.message.reply_text("⚠️ **Connection error to email server.**", parse_mode="Markdown")
+
+async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Checks the inbox of the generated temporary email."""
+    if not context.args:
+        await update.message.reply_text("⚠️ **Usage:** `/inbox <email_address>`\nExample: `/inbox user@1secmail.com`", parse_mode="Markdown")
+        return
+
+    email = context.args[0]
+    if "@" not in email:
+        await update.message.reply_text("❌ **Invalid email format.**", parse_mode="Markdown")
+        return
+
+    login, domain = email.split("@")
+
+    async with httpx.AsyncClient() as client:
+        try:
+            url = f"https://www.1secmail.com/api/v1/?action=getMessages&login={login}&domain={domain}"
+            resp = await client.get(url, timeout=10.0)
+            
+            if resp.status_code == 200:
+                messages = resp.json()
+                if not messages:
+                    await update.message.reply_text("📭 **Inbox is currently empty.**\nWait a few seconds and try again.", parse_mode="Markdown")
+                    return
+
+                latest_msg_id = messages[0]['id']
+                read_url = f"https://www.1secmail.com/api/v1/?action=readMessage&login={login}&domain={domain}&id={latest_msg_id}"
+                read_resp = await client.get(read_url, timeout=10.0)
+
+                if read_resp.status_code == 200:
+                    msg_data = read_resp.json()
+                    sender = msg_data.get('from', 'Unknown')
+                    subject = msg_data.get('subject', 'No Subject')
+                    text_body = msg_data.get('textBody', 'No Content available.')[:1000] 
+
+                    output = (
+                        f"📬 **New Message Received!**\n\n"
+                        f"👤 **From:** `{sender}`\n"
+                        f"📝 **Subject:** `{subject}`\n\n"
+                        f"📄 **Message:**\n`{text_body}`"
+                    )
+                    await update.message.reply_text(output, parse_mode="Markdown")
+                else:
+                    await update.message.reply_text("❌ **Could not read the message content.**", parse_mode="Markdown")
+        except Exception as e:
+            logger.error(f"Inbox Check Error: {e}")
+            await update.message.reply_text("⚠️ **Connection error while checking inbox.**", parse_mode="Markdown")
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 **Welcome!** Send `/menu` to see available commands.", parse_mode="Markdown")
 
 def main():
+    # 1. Start the dummy web server in a separate background thread
+    threading.Thread(target=keep_alive, daemon=True).start()
+
+    # 2. Build the Telegram Bot
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
@@ -238,8 +331,14 @@ def main():
     application.add_handler(CommandHandler("iban", gen_iban))
     application.add_handler(CommandHandler("fake", fake_address))
     application.add_handler(CommandHandler("me", profile_info))
+    
+    # 3. Add the new real email commands
+    application.add_handler(CommandHandler("email", gen_email))
+    application.add_handler(CommandHandler("inbox", check_inbox))
 
     print("Bot is polling and ready to go! 🚀")
+    
+    # 4. Start polling Telegram for messages
     application.run_polling()
 
 if __name__ == "__main__":
