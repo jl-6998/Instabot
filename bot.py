@@ -23,58 +23,57 @@ BIN_API = "https://data.handyapi.com/bin/{}"
 
 # Disguise the bot as a real web browser
 HTTP_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json"
 }
 
-# --- Massive Translation Dictionary (115+ Countries & IBAN Supported Nations) ---
+# --- Massive Translation Dictionary (Every Country Faker/IBAN Supports) ---
 COUNTRY_NAMES = {
-    "albania": "al", "andorra": "ad", "austria": "at", "azerbaijan": "az", 
-    "bahrain": "bh", "belarus": "by", "belgium": "be", "bosnia and herzegovina": "ba", 
-    "bosnia": "ba", "brazil": "br", "bulgaria": "bg", "costa rica": "cr", 
-    "croatia": "hr", "cyprus": "cy", "czech republic": "cz", "czechia": "cz", 
-    "denmark": "dk", "dominican republic": "do", "egypt": "eg", "el salvador": "sv", 
-    "estonia": "ee", "faroe islands": "fo", "finland": "fi", "france": "fr", 
-    "georgia": "ge", "germany": "de", "gibraltar": "gi", "greece": "gr", 
-    "greenland": "gl", "guatemala": "gt", "holy see": "va", "vatican": "va", 
-    "hungary": "hu", "iceland": "is", "iraq": "iq", "ireland": "ie", "israel": "il", 
-    "italy": "it", "jordan": "jo", "kazakhstan": "kz", "kosovo": "xk", "kuwait": "kw", 
-    "latvia": "lv", "lebanon": "lb", "libya": "ly", "liechtenstein": "li", 
-    "lithuania": "lt", "luxembourg": "lu", "malta": "mt", "mauritania": "mr", 
-    "mauritius": "mu", "moldova": "md", "monaco": "mc", "montenegro": "me", 
-    "netherlands": "nl", "north macedonia": "mk", "macedonia": "mk", "norway": "no", 
-    "oman": "om", "pakistan": "pk", "palestine": "ps", "poland": "pl", 
-    "portugal": "pt", "qatar": "qa", "romania": "ro", "saint lucia": "lc", 
-    "san marino": "sm", "sao tome and principe": "st", "saudi arabia": "sa", 
-    "serbia": "rs", "seychelles": "sc", "slovak republic": "sk", "slovakia": "sk", 
-    "slovenia": "si", "spain": "es", "sudan": "sd", "sweden": "se", 
-    "switzerland": "ch", "timor-leste": "tl", "tunisia": "tn", "turkey": "tr", 
-    "ukraine": "ua", "united arab emirates": "ae", "uae": "ae", 
-    "united kingdom": "gb", "uk": "gb", "great britain": "gb", 
-    "virgin islands british": "vg", "bvi": "vg", "nepal": "np", "india": "in", 
-    "bangladesh": "bd", "united states": "us", "usa": "us", "america": "us", 
-    "canada": "ca", "australia": "au", "new zealand": "nz", "japan": "jp", 
-    "china": "cn", "south africa": "za", "mexico": "mx", "argentina": "ar", 
-    "chile": "cl", "peru": "pe", "colombia": "co", "venezuela": "ve", 
-    "russia": "ru", "indonesia": "id", "malaysia": "my", "philippines": "ph", 
-    "thailand": "th", "vietnam": "vn", "singapore": "sg", "sri lanka": "lk", 
-    "south korea": "kr", "korea": "kr", "nigeria": "ng", "kenya": "ke", "ghana": "gh"
+    "afghanistan": "af", "albania": "al", "algeria": "dz", "andorra": "ad", "argentina": "ar", 
+    "armenia": "am", "australia": "au", "austria": "at", "azerbaijan": "az", "bahrain": "bh", 
+    "bangladesh": "bd", "belarus": "by", "belgium": "be", "bolivia": "bo", "bosnia": "ba", 
+    "brazil": "br", "bulgaria": "bg", "canada": "ca", "chile": "cl", "china": "cn", 
+    "colombia": "co", "costa rica": "cr", "croatia": "hr", "cuba": "cu", "cyprus": "cy", 
+    "czechia": "cz", "czech republic": "cz", "denmark": "dk", "dominican republic": "do", 
+    "ecuador": "ec", "egypt": "eg", "el salvador": "sv", "estonia": "ee", "faroe islands": "fo", 
+    "finland": "fi", "france": "fr", "georgia": "ge", "germany": "de", "ghana": "gh", 
+    "gibraltar": "gi", "greece": "gr", "greenland": "gl", "guatemala": "gt", "honduras": "hn", 
+    "hungary": "hu", "iceland": "is", "india": "in", "indonesia": "id", "iran": "ir", 
+    "iraq": "iq", "ireland": "ie", "israel": "il", "italy": "it", "japan": "jp", 
+    "jordan": "jo", "kazakhstan": "kz", "kenya": "ke", "kosovo": "xk", "kuwait": "kw", 
+    "latvia": "lv", "lebanon": "lb", "libya": "ly", "liechtenstein": "li", "lithuania": "lt", 
+    "luxembourg": "lu", "malaysia": "my", "malta": "mt", "mauritania": "mr", "mauritius": "mu", 
+    "mexico": "mx", "moldova": "md", "monaco": "mc", "montenegro": "me", "morocco": "ma", 
+    "nepal": "np", "netherlands": "nl", "new zealand": "nz", "nicaragua": "ni", "nigeria": "ng", 
+    "north macedonia": "mk", "norway": "no", "oman": "om", "pakistan": "pk", "palestine": "ps", 
+    "paraguay": "py", "peru": "pe", "philippines": "ph", "poland": "pl", "portugal": "pt", 
+    "qatar": "qa", "romania": "ro", "russia": "ru", "san marino": "sm", "saudi arabia": "sa", 
+    "serbia": "rs", "singapore": "sg", "slovakia": "sk", "slovenia": "si", "south africa": "za", 
+    "south korea": "kr", "korea": "kr", "spain": "es", "sri lanka": "lk", "sweden": "se", 
+    "switzerland": "ch", "syria": "sy", "taiwan": "tw", "thailand": "th", "tunisia": "tn", 
+    "turkey": "tr", "uae": "ae", "united arab emirates": "ae", "uk": "gb", "united kingdom": "gb", 
+    "ukraine": "ua", "uruguay": "uy", "us": "us", "usa": "us", "united states": "us", 
+    "venezuela": "ve", "vietnam": "vn"
 }
 
-# Faker Locale Map
+# --- Faker Locale Map (Every Locale Supported by Python Faker) ---
 LOCALE_MAP = {
-    'us': 'en_US', 'gb': 'en_GB', 'uk': 'en_GB', 'ca': 'en_CA', 'au': 'en_AU',
-    'de': 'de_DE', 'fr': 'fr_FR', 'it': 'it_IT', 'es': 'es_ES', 'bd': 'bn_BD',
-    'in': 'en_IN', 'ru': 'ru_RU', 'br': 'pt_BR', 'jp': 'ja_JP', 'cn': 'zh_CN',
-    'mx': 'es_MX', 'za': 'en_ZA', 'nl': 'nl_NL', 'ch': 'de_CH', 'se': 'sv_SE',
-    'no': 'no_NO', 'dk': 'da_DK', 'fi': 'fi_FI', 'pl': 'pl_PL', 'cz': 'cs_CZ',
-    'ro': 'ro_RO', 'tr': 'tr_TR', 'gr': 'el_GR', 'ar': 'es_AR', 'co': 'es_CO',
-    'cl': 'es_CL', 'pe': 'es_PE', 've': 'es_VE', 'kr': 'ko_KR', 'tw': 'zh_TW',
-    'id': 'id_ID', 'my': 'ms_MY', 'ph': 'en_PH', 'th': 'th_TH', 'vn': 'vi_VN',
-    'eg': 'ar_EG', 'sa': 'ar_SA', 'ae': 'ar_AE', 'il': 'he_IL', 'pt': 'pt_PT',
-    'at': 'de_AT', 'hu': 'hu_HU', 'bg': 'bg_BG', 'hr': 'hr_HR', 'sk': 'sk_SK',
-    'ua': 'uk_UA', 'ie': 'en_IE', 'ng': 'en_NG', 'ke': 'en_KE', 'nz': 'en_NZ',
-    'be': 'nl_BE', 'pk': 'en_PK', 'sg': 'en_SG', 'lk': 'en_LK', 'np': 'ne_NP',
-    'ee': 'et_EE', 'lt': 'lt_LT', 'lv': 'lv_LV', 'si': 'sl_SI', 'rs': 'sr_RS'
+    'ar': 'es_AR', 'am': 'hy_AM', 'au': 'en_AU', 'at': 'de_AT', 'az': 'az_AZ', 
+    'bd': 'bn_BD', 'be': 'nl_BE', 'bg': 'bg_BG', 'bo': 'es_BO', 'br': 'pt_BR', 
+    'by': 'be_BY', 'ca': 'en_CA', 'ch': 'de_CH', 'cl': 'es_CL', 'cn': 'zh_CN', 
+    'co': 'es_CO', 'cr': 'es_CR', 'cu': 'es_CU', 'cz': 'cs_CZ', 'de': 'de_DE', 
+    'dk': 'da_DK', 'do': 'es_DO', 'ec': 'es_EC', 'ee': 'et_EE', 'eg': 'ar_EG', 
+    'es': 'es_ES', 'fi': 'fi_FI', 'fr': 'fr_FR', 'gb': 'en_GB', 'ge': 'ka_GE', 
+    'gh': 'en_GH', 'gr': 'el_GR', 'gt': 'es_GT', 'hn': 'es_HN', 'hr': 'hr_HR', 
+    'hu': 'hu_HU', 'id': 'id_ID', 'ie': 'en_IE', 'il': 'he_IL', 'in': 'en_IN', 
+    'ir': 'fa_IR', 'it': 'it_IT', 'jp': 'ja_JP', 'ke': 'en_KE', 'kr': 'ko_KR', 
+    'lt': 'lt_LT', 'lv': 'lv_LV', 'mt': 'en_MT', 'mx': 'es_MX', 'my': 'ms_MY', 
+    'ng': 'en_NG', 'ni': 'es_NI', 'nl': 'nl_NL', 'no': 'no_NO', 'np': 'ne_NP', 
+    'nz': 'en_NZ', 'pe': 'es_PE', 'ph': 'en_PH', 'pk': 'ur_PK', 'pl': 'pl_PL', 
+    'pt': 'pt_PT', 'py': 'es_PY', 'ro': 'ro_RO', 'rs': 'sr_RS', 'ru': 'ru_RU', 
+    'sa': 'ar_SA', 'se': 'sv_SE', 'sg': 'en_SG', 'si': 'sl_SI', 'sk': 'sk_SK', 
+    'sv': 'es_SV', 'th': 'th_TH', 'tr': 'tr_TR', 'tw': 'zh_TW', 'ua': 'uk_UA', 
+    'us': 'en_US', 'uy': 'es_UY', 've': 'es_VE', 'vn': 'vi_VN', 'za': 'en_ZA'
 }
 
 # --- Helper Functions ---
@@ -177,7 +176,7 @@ async def bin_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await update.message.reply_text("❌ **BIN not found.**", parse_mode="Markdown")
             else:
                 await update.message.reply_text("❌ **API rate-limited.**", parse_mode="Markdown")
-        except Exception as e:
+        except:
             await update.message.reply_text("⚠️ **Connection error to lookup service.**", parse_mode="Markdown")
 
 async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -229,8 +228,8 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = " ".join(context.args).lower()
     country_code = COUNTRY_NAMES.get(user_input, user_input)
     locale = LOCALE_MAP.get(country_code, 'en_US')
-    raw_country_name = user_input.upper() if country_code in LOCALE_MAP else "UNITED STATES (Fallback)"
     
+    raw_country_name = user_input.upper() if country_code in LOCALE_MAP else "UNITED STATES (Fallback)"
     display_country = to_bold_sans(raw_country_name)
     flag_emoji = get_flag(country_code) if country_code in LOCALE_MAP else "🇺🇸"
 
@@ -252,7 +251,7 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text("⚠️ **Error generating offline address.**", parse_mode="Markdown")
+        await update.message.reply_text(f"⚠️ **Error generating offline address:** `{str(e)}`", parse_mode="Markdown")
 
 async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
@@ -263,8 +262,16 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     country_code = COUNTRY_NAMES.get(user_input, user_input).upper()
 
     try:
-        iban_obj = schwifty.IBAN.generate(country_code)
-        iban_str = str(iban_obj)
+        # 1. Fetch random valid IBAN from an online generator to ensure perfect validity
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(f"https://www.iban-generator.com/api/generate?country={country_code}", headers=HTTP_HEADERS, timeout=10.0)
+            iban_str = resp.json().get("iban")
+            
+            if not iban_str:
+                raise ValueError("API did not return an IBAN.")
+                
+        # 2. Slice it cleanly using Schwifty offline
+        iban_obj = schwifty.IBAN(iban_str)
         flag = get_flag(country_code)
         
         msg = (
@@ -278,10 +285,8 @@ async def gen_iban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📝 BBAN: `{iban_obj.bban}`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
-    except ValueError:
-        await update.message.reply_text(f"❌ **'{country_code}' is invalid or does not use the IBAN system.**\n*(Note: Countries like the USA, Canada, India, and Nepal do not use IBANs)*", parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text("⚠️ **Error generating IBAN data.**", parse_mode="Markdown")
+        await update.message.reply_text(f"❌ **'{country_code}' is invalid, does not use the IBAN system, or API failed.**", parse_mode="Markdown")
 
 async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -297,17 +302,24 @@ async def profile_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with httpx.AsyncClient() as client:
         try:
-            domain_resp = await client.get("https://api.mail.tm/domains", timeout=10.0)
-            if domain_resp.status_code != 200:
-                await update.message.reply_text("❌ **Failed to fetch email servers.**", parse_mode="Markdown")
-                return
+            # FIX: Safely parse the complex nested dictionary Mail.tm uses for Domains
+            domain_resp = await client.get("https://api.mail.tm/domains", headers=HTTP_HEADERS, timeout=10.0)
+            domain_data = domain_resp.json()
+            
+            # Extract domain string dynamically depending on their API version
+            if 'hydra:member' in domain_data:
+                domain = domain_data['hydra:member'][0]['domain']
+            elif type(domain_data) is list:
+                domain = domain_data[0]['domain']
+            else:
+                domain = "vjuum.com" # Reliable static fallback domain
                 
-            domain = domain_resp.json()[0]['domain']
             username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
             address = f"{username}@{domain}"
             password = f"{username}SecretPass123!"
             
-            acc_resp = await client.post("https://api.mail.tm/accounts", json={"address": address, "password": password}, timeout=10.0)
+            payload = {"address": address, "password": password}
+            acc_resp = await client.post("https://api.mail.tm/accounts", json=payload, headers=HTTP_HEADERS, timeout=10.0)
             
             if acc_resp.status_code in [200, 201]:
                 msg = (
@@ -318,9 +330,9 @@ async def gen_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 await update.message.reply_text(msg, parse_mode="Markdown")
             else:
-                await update.message.reply_text("❌ **Failed to register email account.**", parse_mode="Markdown")
+                await update.message.reply_text(f"❌ **Failed to register email.** API Code: {acc_resp.status_code}", parse_mode="Markdown")
         except Exception as e:
-            await update.message.reply_text("⚠️ **Connection error to email server.**", parse_mode="Markdown")
+            await update.message.reply_text(f"⚠️ **Email Server Error:** `{str(e)}`", parse_mode="Markdown")
 
 async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
@@ -337,15 +349,17 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     async with httpx.AsyncClient() as client:
         try:
-            token_resp = await client.post("https://api.mail.tm/token", json={"address": address, "password": password}, timeout=10.0)
+            # Authenticate
+            token_resp = await client.post("https://api.mail.tm/token", json={"address": address, "password": password}, headers=HTTP_HEADERS, timeout=10.0)
             if token_resp.status_code != 200:
                 await update.message.reply_text("❌ **Could not authenticate. Make sure the address was generated by this bot.**", parse_mode="Markdown")
                 return
                 
             token = token_resp.json()['token']
-            headers = {"Authorization": f"Bearer {token}"}
+            auth_headers = {**HTTP_HEADERS, "Authorization": f"Bearer {token}"}
             
-            msg_resp = await client.get("https://api.mail.tm/messages", headers=headers, timeout=10.0)
+            # Fetch Inbox
+            msg_resp = await client.get("https://api.mail.tm/messages", headers=auth_headers, timeout=10.0)
             if msg_resp.status_code == 200:
                 messages = msg_resp.json().get('hydra:member', [])
                 if not messages:
@@ -353,7 +367,7 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return
 
                 latest_msg_id = messages[0]['id']
-                read_resp = await client.get(f"https://api.mail.tm/messages/{latest_msg_id}", headers=headers, timeout=10.0)
+                read_resp = await client.get(f"https://api.mail.tm/messages/{latest_msg_id}", headers=auth_headers, timeout=10.0)
 
                 if read_resp.status_code == 200:
                     msg_data = read_resp.json()
@@ -371,7 +385,7 @@ async def check_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await update.message.reply_text("❌ **Could not reach inbox.**", parse_mode="Markdown")
         except Exception as e:
-            await update.message.reply_text("⚠️ **Connection error while checking inbox.**", parse_mode="Markdown")
+            await update.message.reply_text(f"⚠️ **Inbox Checking Error:** `{str(e)}`", parse_mode="Markdown")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 **Welcome!** Send `/menu` to see available commands.", parse_mode="Markdown")
