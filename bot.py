@@ -1,6 +1,9 @@
 import logging
 import random
 import string
+import os
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import httpx
 from faker import Faker
 import schwifty
@@ -92,14 +95,6 @@ def luhn_check(card_num: str) -> bool:
         if digits[i] > 9: digits[i] -= 9
     return sum(digits) % 10 == 0
 
-def generate_dot_trick_email(base_name: str) -> str:
-    clean_name = "".join(c for c in base_name.lower() if c.isalpha()) or "testuser"
-    dotted_name = clean_name[0]
-    for char in clean_name[1:]:
-        if random.choice([True, False]): dotted_name += "."
-        dotted_name += char
-    return f"{dotted_name}@gmail.com"
-
 def get_flag(country_code: str) -> str:
     if not country_code or len(country_code) != 2: return "🌍"
     return ''.join(chr(ord(c.upper()) + 127397) for c in country_code)
@@ -111,6 +106,20 @@ def to_bold_sans(text: str) -> str:
         elif 'a' <= char <= 'z': bold_text += chr(ord(char) - 97 + 120302)
         else: bold_text += char
     return bold_text
+
+# --- Dummy Web Server to keep Pella/Pterodactyl Happy ---
+
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive and running!")
+
+def keep_alive():
+    # Pella/Pterodactyl uses SERVER_PORT to track if the app successfully started
+    port = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", 8080)))
+    server = HTTPServer(("0.0.0.0", port), DummyHandler)
+    server.serve_forever()
 
 # --- Command Handlers ---
 
@@ -182,7 +191,6 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Please provide at least a 6-digit BIN.")
         return
 
-    # --- SMART CARD NETWORK & LENGTH DETECTION ---
     card_len = 16
     cvv_len = 3
     
@@ -196,16 +204,13 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif base_bin.startswith('35'):
         card_len = 16 # JCB
     
-    # Fallback to avoid crashes if someone provides an overly long base BIN
     if len(base_bin) >= card_len:
         card_len = len(base_bin) + 1 
 
     generated_cards = []
     for _ in range(10):
-        # 1. Generate payload (everything except the last Luhn digit)
         payload = base_bin + "".join(random.choices(string.digits, k=max(0, card_len - len(base_bin) - 1)))
         
-        # 2. Calculate the valid Luhn checksum digit mathematically
         digits = [int(x) for x in payload]
         for i in range(len(digits) - 1, -1, -2):
             digits[i] *= 2
@@ -213,15 +218,12 @@ async def gen_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 digits[i] -= 9
         checksum = (10 - (sum(digits) % 10)) % 10
         
-        # 3. Assemble full mathematically valid card
         card_num = payload + str(checksum)
-        
         mm = str(random.randint(1, 12)).zfill(2)
         yyyy = str(random.randint(2025, 2035))
         cvv = "".join(random.choices(string.digits, k=cvv_len))
         generated_cards.append(f"`{card_num}|{mm}|{yyyy}|{cvv}`")
 
-    # Look up real BIN details to make the message look professional
     info_str, bank_str, country_str = "Unknown", "Unknown", "Unknown"
     async with httpx.AsyncClient() as client:
         try:
@@ -276,8 +278,7 @@ async def fake_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🗺️ 𝗦𝘁𝗮𝘁𝗲/𝗣𝗿𝗼𝘃𝗶𝗻𝗰𝗲/𝗥𝗲𝗴𝗶𝗼𝗻: `{state}`\n"
             f"📮 𝗣𝗼𝘀𝘁𝗮𝗹 𝗖𝗼𝗱𝗲: `{fake.postcode()}`\n"
             f"📞 𝗣𝗵𝗼𝗻𝗲 𝗡𝘂𝗺𝗯𝗲𝗿: `{fake.phone_number()}`\n"
-            f"🌍 𝗖𝗼𝘂𝗻𝘁𝗿𝘆: `{fake.current_country()}`\n"
-            f"📧 𝗧𝗲𝗺𝗽𝗼𝗿𝗮𝗿𝘆 𝗘𝗺𝗮𝗶𝗹: `{generate_dot_trick_email(full_name.replace(' ', ''))}`"
+            f"🌍 𝗖𝗼𝘂𝗻𝘁𝗿𝘆: `{fake.current_country()}`"
         )
         await update.message.reply_text(msg, parse_mode="Markdown")
     except Exception as e:
@@ -439,6 +440,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 **Welcome!** Send `/menu` to see available commands.", parse_mode="Markdown")
 
 def main():
+    # Start the dummy server in a background thread
+    threading.Thread(target=keep_alive, daemon=True).start()
+
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
