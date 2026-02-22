@@ -1,9 +1,6 @@
 import logging
 import random
 import string
-import os
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import httpx
 from faker import Faker
 import schwifty
@@ -114,19 +111,6 @@ def to_bold_sans(text: str) -> str:
         elif 'a' <= char <= 'z': bold_text += chr(ord(char) - 97 + 120302)
         else: bold_text += char
     return bold_text
-
-# --- Dummy Web Server to keep Render Happy ---
-
-class DummyHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Bot is alive and running!")
-
-def keep_alive():
-    port = int(os.environ.get("PORT", 8080))
-    server = HTTPServer(("0.0.0.0", port), DummyHandler)
-    server.serve_forever()
 
 # --- Command Handlers ---
 
@@ -455,8 +439,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 **Welcome!** Send `/menu` to see available commands.", parse_mode="Markdown")
 
 def main():
-    threading.Thread(target=keep_alive, daemon=True).start()
-
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
